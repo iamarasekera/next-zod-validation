@@ -1,95 +1,86 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+// src/pages/login.tsx
+"use client";
+import React, { useState } from 'react';
+import { validateFormData } from '../utils/validation.ts'; // Import the validation function
+import { schemaLogin } from '../schemas/login.schema'; // Import the Zod validation schema
 
-export default function Home() {
+// Define the shape of the form data
+type FormData = {
+  email: string;
+  password: string;
+};
+
+// Define the shape of the error messages
+type Errors = {
+  email?: string;
+  password?: string;
+};
+
+const LoginPage = () => {
+  // State to store form data
+  const [formData, setFormData] = useState<FormData>({ email: '', password: '' });
+  // State to store validation error messages
+  const [errors, setErrors] = useState<Errors>({});
+
+  // Handle changes in input fields
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value, // Update the relevant field based on the input name
+    });
+  };
+
+  // Handle form submission
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); // Prevent default form submission
+
+    // Validate form data using the validation function and schema
+    const { errors, data } = validateFormData(schemaLogin, formData);
+
+    if (errors) {
+      // If there are validation errors, update the errors state
+      setErrors(errors);
+    } else {
+      // If validation is successful, clear errors and log the valid data
+      setErrors({});
+      console.log('Form data is valid:', data);
+      // Proceed with form submission logic (e.g., API request)
+    }
+  };
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+      <form onSubmit={handleSubmit} style={{ width: '300px' }} noValidate>
+        <div style={{ marginBottom: '16px' }}>
+          <label htmlFor="email">Email:</label>
+          <input
+            type="text"
+            name="email"
+            id="email"
+            value={formData.email} // Bind input value to form data
+            onChange={handleChange} // Handle changes in input field
+            style={{ width: '100%', padding: '8px', marginTop: '8px' }}
+          />
+          {errors.email && <p style={{ color: 'red', marginTop: '4px' }}>{errors.email}</p>} {/* Display email error message */}
         </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+        <div style={{ marginBottom: '16px' }}>
+          <label htmlFor="password">Password:</label>
+          <input
+            type="password"
+            name="password"
+            id="password"
+            value={formData.password} // Bind input value to form data
+            onChange={handleChange} // Handle changes in input field
+            style={{ width: '100%', padding: '8px', marginTop: '8px' }}
+          />
+          {errors.password && <p style={{ color: 'red', marginTop: '4px' }}>{errors.password}</p>} {/* Display password error message */}
+        </div>
+        <button type="submit" style={{ width: '100%', padding: '10px', background: '#0070f3', color: '#fff', border: 'none', borderRadius: '4px' }}>
+          Login
+        </button>
+      </form>
+    </div>
   );
-}
+};
+
+export default LoginPage;
